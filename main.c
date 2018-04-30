@@ -16,9 +16,10 @@ int main(int argc, char **argv)
 
     printf("DFS searching: %d\n", right_most);
 
-    //DFS_Result result = depth_first_search(tree, right_most);
+    DFSResult result = depth_first_search(tree, right_most);
 
-    //printf("Goal %d\n found", result.goal);
+    printf("Goal %d found with %d checks\n", result.goal, result.checks);
+    print_path(result.path);
 
     return 0;
 }
@@ -29,7 +30,7 @@ int get_right_most_value(Tree *tree)
     Node *node = tree->root;
 
     while(node->children)
-        node = node->children[bf - 1];
+        node = node->children[0];
     
     return node->value;
 }

@@ -3,14 +3,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct dfs_result
+typedef struct DFS_Result
 {
-    int goal;
+    int goal; // if -1, then no goal is found
     int checks; // number of node checked
     GArray *path;
-    
+} DFSResult;
 
-} DFS_Result;
+// keep track of path lead to a node
+typedef struct Search_Step
+{   
+    Node *node;
+    int depth;
 
+} SearchStep;
 
-DFS_Result depth_first_search(Tree *tree, int goal);
+int checked_count;
+
+DFSResult depth_first_search(Tree *tree, int goal);
+void print_path(GArray *path);

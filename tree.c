@@ -20,7 +20,7 @@ Tree *init_tree(int d, int bf)
 
 void tree_generation(int d, int bf, Node *node)
 {
-    if (!d)
+    if (d <= 0)
         return;
 
     int cur_depth = d - 1;
@@ -34,6 +34,7 @@ void tree_generation(int d, int bf, Node *node)
         int value = rand() % 131; // 131 is pretty good for small trees
         
         child->value = value; 
+        child->children = NULL;
 
         node->children[i] = child;
         tree_generation(cur_depth, bf, child);
