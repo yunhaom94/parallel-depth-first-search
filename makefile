@@ -10,7 +10,7 @@ tree.o: tree.c tree.h
 	$(CC) -g -o tree.o -c tree.c $(FLAGS) 
 
 main: main.c tree.o dfs.o
-	$(CC) $(FLAGS) -g $< tree.o dfs.o -o $@ -lglib-2.0
+	$(CC) $(FLAGS) -g $< tree.o dfs.o -o $@ -lglib-2.0 -lm
 
 clean:
 	rm -f *.o 

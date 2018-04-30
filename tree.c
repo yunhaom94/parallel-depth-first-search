@@ -31,7 +31,7 @@ void tree_generation(int d, int bf, Node *node)
     {   
         child = malloc(sizeof(Node));
         
-        int value = rand() % 131; // 131 is pretty good for small trees
+        int value = rand();
         
         child->value = value; 
         child->children = NULL;

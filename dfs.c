@@ -2,7 +2,8 @@
 #include "dfs.h"
 
 DFSResult depth_first_search(Tree *tree, int goal)
-{
+{   
+    struct timeval  tv1, tv2;
     int bf = tree->bf;
     int depth = 0;
 
@@ -12,11 +13,13 @@ DFSResult depth_first_search(Tree *tree, int goal)
     DFSResult result;
     checked_count = 0;
 
-    SearchStep *start = malloc(sizeof(SearchStep));
-    start->node = tree->root;
-    start->depth = 0;
+    SearchStep *root = malloc(sizeof(SearchStep));
+    root->node = tree->root;
+    root->depth = 0;
 
-    g_array_append_val(open_list, start);
+    gettimeofday(&tv1, NULL);
+
+    g_array_append_val(open_list, root);
 
     while (open_list->len > 0)
     {
@@ -35,9 +38,13 @@ DFSResult depth_first_search(Tree *tree, int goal)
 
         if (node->value == goal)
         {
+            
             result.checks = checked_count + 1;
             result.goal = goal;
             result.path = path;
+
+            gettimeofday(&tv2, NULL);
+            result.time_used = (double) (tv2.tv_usec - tv1.tv_usec) / 1000000 + (double) (tv2.tv_sec - tv1.tv_sec);
 
             g_array_free(open_list, FALSE);    
             return result;
@@ -58,9 +65,11 @@ DFSResult depth_first_search(Tree *tree, int goal)
         }
     }
 
-     g_array_free(open_list, FALSE);    
-
     result.goal = -1;
+    gettimeofday(&tv2, NULL);
+    result.time_used = (double) (tv2.tv_usec - tv1.tv_usec) / 1000000 + (double) (tv2.tv_sec - tv1.tv_sec);
+
+    g_array_free(open_list, FALSE);  
     return result;
 
 }
