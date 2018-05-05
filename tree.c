@@ -6,19 +6,20 @@ Tree *init_tree(int d, int bf)
     Tree *tree = malloc(sizeof(Tree));
     tree->d = d;
     tree->bf = bf;
+    tree->count = 1;
     
     Node *root = malloc(sizeof(Node));
     srand(time(NULL));
     root->value = rand() % 131; 
     tree->root = root;
 
-    tree_generation(d, bf, root);
+    tree_generation(d, bf, root, tree);
 
     return tree;
 }
 
 
-void tree_generation(int d, int bf, Node *node)
+void tree_generation(int d, int bf, Node *node, Tree* tree)
 {
     if (d <= 0)
         return;
@@ -30,14 +31,15 @@ void tree_generation(int d, int bf, Node *node)
     for (int i = 0; i < bf; i++)
     {   
         child = malloc(sizeof(Node));
-        
+        tree->count += 1;
+
         int value = rand();
         
         child->value = value; 
         child->children = NULL;
 
         node->children[i] = child;
-        tree_generation(cur_depth, bf, child);
+        tree_generation(cur_depth, bf, child, tree);
     }
 
 }
