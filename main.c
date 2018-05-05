@@ -32,7 +32,7 @@ int main(int argc, char **argv)
     printf("DFS: Goal %d found with %d checks in %f seconds\n", result.goal, result.checks, result.time_used);
     //print_path(result.path);
 
-    int threads = 4;
+    int threads = 2;
 
     struct timeval tv1, tv2;
     gettimeofday(&tv1, NULL);
@@ -53,5 +53,6 @@ int get_right_most_value(Tree *tree)
     while(node->children)
         node = node->children[bf - 1];
     
+    node->value = 0 - node->value;
     return node->value;
 }
