@@ -29,6 +29,7 @@ typedef struct DFS_Thread_Args
     GArray *open_list;
     int bf;
     int goal;
+    DFSResult *result;
 
 } DFSThreadArgs;
 
@@ -43,8 +44,8 @@ pthread_mutex_t thread_count_lock;
 DFSResult *init_dfs_result();
 void destory_dfs_result(DFSResult * dfsresult);
 
-DFSResult *depth_first_search(Tree *tree, int goal, DFSResult *result);
+int depth_first_search(Tree *tree, int goal, DFSResult *result);
 
-DFSResult *parallel_dfs(Tree *tree, int goal, int num_threads);
+int parallel_dfs(Tree *tree, int goal, int num_threads, DFSResult *result);
 void *dfs_threads(void *thread_args);
-DFSResult *dfs_search_left(SearchStep *node, GArray *open_list, int bf, int goal);
+int dfs_search_left(SearchStep *node_step, GArray *open_list, int bf, int goal, DFSResult *result);

@@ -4,7 +4,7 @@
 DFSResult *init_dfs_result()
 {
     DFSResult *r = malloc(sizeof(DFSResult));
-    r->goal = -1;
+    r->goal = 0;
     r->checks = 0;
 }
 
@@ -13,8 +13,9 @@ void destory_dfs_result(DFSResult * dfsresult)
     free(dfsresult);
 }
 
-
-DFSResult *depth_first_search(Tree *tree, int goal, DFSResult *result)
+// return 1 for found
+// return 0 for not found
+int depth_first_search(Tree *tree, int goal, DFSResult *result)
 {
     int bf = tree->bf;
     int depth = 0;
@@ -48,7 +49,7 @@ DFSResult *depth_first_search(Tree *tree, int goal, DFSResult *result)
             result->goal = goal;
 
             g_array_free(open_list, FALSE);
-            return result;
+            return 1;
         }
 
         checked_count += 1; // increment # of expanded nodes
@@ -69,14 +70,14 @@ DFSResult *depth_first_search(Tree *tree, int goal, DFSResult *result)
     result->goal = -1;
 
     g_array_free(open_list, FALSE);
-    return result;
+    return 0;
 }
 
 
+/*=============================================================================*/
 
 
-
-DFSResult *parallel_dfs(Tree *tree, int goal, int num_threads)
+int parallel_dfs(Tree *tree, int goal, int num_threads, DFSResult *result)
 {   
     checked_count = 0;
     total_threads = num_threads;
@@ -95,6 +96,7 @@ DFSResult *parallel_dfs(Tree *tree, int goal, int num_threads)
     args.open_list = open_list;
     args.bf = bf;
     args.goal = goal;
+    args.result = result;
 
     pthread_cond_init(&found, NULL);
     pthread_mutex_init(&mutex, NULL);
@@ -113,7 +115,7 @@ DFSResult *parallel_dfs(Tree *tree, int goal, int num_threads)
         }
     }
 
-    void *result;
+    void *is_found;
 
     // wait for conditional variable
     
@@ -121,7 +123,7 @@ DFSResult *parallel_dfs(Tree *tree, int goal, int num_threads)
     pthread_t tid = thread_found; // in case other thread changed it
     pthread_mutex_unlock(&mutex);
 
-    int th = pthread_join(tid, &result);
+    int th = pthread_join(tid, &is_found);
     
     if (th)
     {
@@ -135,7 +137,7 @@ DFSResult *parallel_dfs(Tree *tree, int goal, int num_threads)
             pthread_cancel(threads[i]);
     }
 
-    return (DFSResult *)result;;
+    return (long)is_found;
 
 }
 
@@ -146,8 +148,7 @@ void *dfs_threads(void *thread_args)
     GArray *open_list = args->open_list;
     int bf = args->bf;
     int goal = args->goal;
-
-    DFSResult *final_result = malloc(sizeof(DFSResult));
+    DFSResult *result = args->result;
 
     while (1)
     { // lock here
@@ -169,8 +170,9 @@ void *dfs_threads(void *thread_args)
                 pthread_mutex_unlock(&mutex);
 
                 pthread_mutex_unlock(&thread_count_lock);
-                final_result->goal = -1;
-                return (void *)final_result;
+                if (!result->goal)
+                    result->goal = -1;
+                return (void *)0;
             } else {
                 total_threads -= 1;
                 pthread_mutex_unlock(&thread_count_lock);
@@ -183,9 +185,9 @@ void *dfs_threads(void *thread_args)
         g_array_remove_index(open_list, len - 1);
         pthread_mutex_unlock(&open_list_lock);
 
-        DFSResult *result = dfs_search_left(node_step, open_list, bf, goal);
+        int is_found = dfs_search_left(node_step, open_list, bf, goal, result);
 
-        if (result->goal == goal)
+        if (is_found == 1)
         {   
 
             pthread_mutex_lock(&mutex);
@@ -193,14 +195,13 @@ void *dfs_threads(void *thread_args)
             pthread_cond_signal(&found);
             pthread_mutex_unlock(&mutex);
 
-            return (void *) result;
+            return (void *)1;
         }
     }
 }
 
-DFSResult *dfs_search_left(SearchStep *node_step, GArray *open_list, int bf, int goal)
+int dfs_search_left(SearchStep *node_step, GArray *open_list, int bf, int goal, DFSResult *result)
 {
-    DFSResult *result = malloc(sizeof(DFSResult));
 
     Node *node = node_step->node;
     int depth = node_step->depth;
@@ -209,7 +210,7 @@ DFSResult *dfs_search_left(SearchStep *node_step, GArray *open_list, int bf, int
     {
         result->checks = checked_count + 1;
         result->goal = node->value;
-        return result;
+        return 1;
     }
     
     checked_count += 1; // increment # of expanded nodes
@@ -233,12 +234,13 @@ DFSResult *dfs_search_left(SearchStep *node_step, GArray *open_list, int bf, int
         left_child->node = get_children(node)[0];
         left_child->depth = depth + 1;
 
-        return dfs_search_left(left_child, open_list, bf, goal);
+        return dfs_search_left(left_child, open_list, bf, goal, result);
 
     } else {
 
-        result->goal = -1;
-        return result;
+        if (!result->goal)
+            result->goal = -1;
+        return 0;
     }
 
 }

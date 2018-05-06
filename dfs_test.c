@@ -41,7 +41,7 @@ int main(int argc, char **argv)
     DFSResult *result_1 = init_dfs_result();
 
     gettimeofday(&tv1, NULL);
-    result_1 = depth_first_search(tree, right_most, result_1);
+    depth_first_search(tree, right_most, result_1);
     gettimeofday(&tv2, NULL);
     time_used = (double)(tv2.tv_usec - tv1.tv_usec) / 1000000 + (double)(tv2.tv_sec - tv1.tv_sec);
     
@@ -49,8 +49,10 @@ int main(int argc, char **argv)
 
     destory_dfs_result(result_1);
 
+    DFSResult *result_2 = init_dfs_result();
+
     gettimeofday(&tv1, NULL);
-    DFSResult *result_2 = parallel_dfs(tree, right_most, threads);
+    parallel_dfs(tree, right_most, threads, result_2);
     gettimeofday(&tv2, NULL);
     time_used = (double)(tv2.tv_usec - tv1.tv_usec) / 1000000 + (double)(tv2.tv_sec - tv1.tv_sec);
 
