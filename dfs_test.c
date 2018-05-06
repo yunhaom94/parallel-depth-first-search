@@ -5,6 +5,9 @@
 
 int get_right_most_value(Tree *tree);
 
+
+// this test will randomlly generated a tree with given depth and branching factor
+// and search for the right most child, and print the time of operation
 int main(int argc, char **argv)
 {
 
