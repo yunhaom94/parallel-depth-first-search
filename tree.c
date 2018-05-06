@@ -50,11 +50,36 @@ Node **get_children(Node *node)
     return node->children;
 }
 
-
 void destory_tree(Tree *tree)
 {
-    //
+    int bf = tree->bf;
+    destory_tree_recursion(tree->root, bf);
+    free(tree);
+
 }
+
+void destory_tree_recursion(Node *node, int bf)
+{
+    if (node == NULL)
+       return;
+  
+    Node *child;
+    for (int i = 0; i < bf; i++)
+    {   
+        if (!node->children)
+            child = NULL;
+        else
+            child = node->children[i];
+
+        destory_tree_recursion(child, bf);
+
+    }
+
+    free(node->children);
+    free(node);
+}
+
+
 
 
 void print_tree(Tree *tree)

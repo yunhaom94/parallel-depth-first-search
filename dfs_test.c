@@ -58,6 +58,8 @@ int main(int argc, char **argv)
 
     printf("Parallel DFS with %d threads: Goal %d found with %d checks in %f seconds\n", threads, result_2->goal, result_2->checks, time_used);
 
+    destory_dfs_result(result_2);
+
     destory_tree(tree);
 
     return 0;

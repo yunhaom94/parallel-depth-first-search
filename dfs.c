@@ -111,6 +111,7 @@ int parallel_dfs(Tree *tree, int goal, int num_threads, DFSResult *result)
         if (th)
         {
             printf("ERROR in threads creation\n");
+            g_array_free(open_list, FALSE);
             exit(-1);
         }
     }
@@ -128,6 +129,7 @@ int parallel_dfs(Tree *tree, int goal, int num_threads, DFSResult *result)
     if (th)
     {
         printf("ERROR in threads join\n");
+        g_array_free(open_list, FALSE);
         exit(-1);
     }
 
@@ -137,6 +139,7 @@ int parallel_dfs(Tree *tree, int goal, int num_threads, DFSResult *result)
             pthread_cancel(threads[i]);
     }
 
+    g_array_free(open_list, FALSE);
     return (long)is_found;
 
 }
@@ -187,6 +190,8 @@ void *dfs_threads(void *thread_args)
 
         int is_found = dfs_search_left(node_step, open_list, bf, goal, result);
 
+        free(node_step);
+
         if (is_found == 1)
         {   
 
@@ -205,7 +210,8 @@ int dfs_search_left(SearchStep *node_step, GArray *open_list, int bf, int goal, 
 
     Node *node = node_step->node;
     int depth = node_step->depth;
-
+    
+    
     if (node->value == goal)
     {
         result->checks = checked_count + 1;
@@ -233,11 +239,10 @@ int dfs_search_left(SearchStep *node_step, GArray *open_list, int bf, int goal, 
         SearchStep *left_child = malloc(sizeof(SearchStep));
         left_child->node = get_children(node)[0];
         left_child->depth = depth + 1;
-
+        
         return dfs_search_left(left_child, open_list, bf, goal, result);
 
     } else {
-
         if (!result->goal)
             result->goal = -1;
         return 0;
