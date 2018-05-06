@@ -51,7 +51,7 @@ Node **get_children(Node *node)
 }
 
 
-void clean_tree(Tree *tree)
+void destory_tree(Tree *tree)
 {
     //
 }

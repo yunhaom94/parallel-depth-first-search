@@ -1,14 +1,26 @@
 #include "tree.h"
 #include "dfs.h"
 
-DFSResult depth_first_search(Tree *tree, int goal)
+DFSResult *init_dfs_result()
+{
+    DFSResult *r = malloc(sizeof(DFSResult));
+    r->goal = -1;
+    r->checks = 0;
+}
+
+void destory_dfs_result(DFSResult * dfsresult)
+{
+    free(dfsresult);
+}
+
+
+DFSResult *depth_first_search(Tree *tree, int goal, DFSResult *result)
 {
     int bf = tree->bf;
     int depth = 0;
 
     GArray *open_list = g_array_new(FALSE, TRUE, sizeof(SearchStep *));
-
-    DFSResult result;
+    
     checked_count = 0;
 
     SearchStep *root = malloc(sizeof(SearchStep));
@@ -32,8 +44,8 @@ DFSResult depth_first_search(Tree *tree, int goal)
         if (node->value == goal)
         {
 
-            result.checks = checked_count + 1;
-            result.goal = goal;
+            result->checks = checked_count + 1;
+            result->goal = goal;
 
             g_array_free(open_list, FALSE);
             return result;
@@ -54,7 +66,7 @@ DFSResult depth_first_search(Tree *tree, int goal)
         }
     }
 
-    result.goal = -1;
+    result->goal = -1;
 
     g_array_free(open_list, FALSE);
     return result;
@@ -90,7 +102,6 @@ DFSResult *parallel_dfs(Tree *tree, int goal, int num_threads)
     pthread_mutex_init(&thread_count_lock, NULL);
 
 
-
     pthread_mutex_lock(&mutex);
     for (int i = 0; i < num_threads; i++)
     {
@@ -124,9 +135,7 @@ DFSResult *parallel_dfs(Tree *tree, int goal, int num_threads)
             pthread_cancel(threads[i]);
     }
 
-    DFSResult *final_result = (DFSResult *)result;
-
-    return final_result;
+    return (DFSResult *)result;;
 
 }
 

@@ -40,8 +40,10 @@ pthread_mutex_t open_list_lock;
 int total_threads;
 pthread_mutex_t thread_count_lock;
 
-DFSResult depth_first_search(Tree *tree, int goal);
-void print_path(GArray *path);
+DFSResult *init_dfs_result();
+void destory_dfs_result(DFSResult * dfsresult);
+
+DFSResult *depth_first_search(Tree *tree, int goal, DFSResult *result);
 
 DFSResult *parallel_dfs(Tree *tree, int goal, int num_threads);
 void *dfs_threads(void *thread_args);
