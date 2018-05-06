@@ -45,6 +45,12 @@ void tree_generation(int d, int bf, Node *node, Tree* tree)
 }
 
 
+Node **get_children(Node *node)
+{
+    return node->children;
+}
+
+
 void clean_tree(Tree *tree)
 {
     //

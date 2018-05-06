@@ -41,12 +41,12 @@ DFSResult depth_first_search(Tree *tree, int goal)
 
         checked_count += 1; // increment # of expanded nodes
 
-        if (node->children)
+        if (get_children(node))
         {
             for (int i = 0; i < bf; i++)
             {
                 SearchStep *child = malloc(sizeof(SearchStep));
-                child->node = node->children[i];
+                child->node = get_children(node)[i];
                 child->depth = depth + 1;
 
                 g_array_append_val(open_list, child);
@@ -182,7 +182,6 @@ void *dfs_threads(void *thread_args)
             pthread_mutex_lock(&mutex);
             thread_found = pthread_self();
             pthread_cond_signal(&found);
-            printf("found and signaled\n");
             pthread_mutex_unlock(&mutex);
 
             return (void *) result;
@@ -206,12 +205,12 @@ DFSResult *dfs_search_left(SearchStep *node_step, GArray *open_list, int bf, int
     
     checked_count += 1; // increment # of expanded nodes
 
-    if (node->children)
+    if (get_children(node))
     {
         for (int i = 1; i < bf; i++)
         {
             SearchStep *child = malloc(sizeof(SearchStep));
-            child->node = node->children[i];
+            child->node = get_children(node)[i];
             child->depth = depth + 1;
 
             // Lock here
@@ -222,7 +221,7 @@ DFSResult *dfs_search_left(SearchStep *node_step, GArray *open_list, int bf, int
         }
 
         SearchStep *left_child = malloc(sizeof(SearchStep));
-        left_child->node = node->children[0];
+        left_child->node = get_children(node)[0];
         left_child->depth = depth + 1;
 
         return dfs_search_left(left_child, open_list, bf, goal);
